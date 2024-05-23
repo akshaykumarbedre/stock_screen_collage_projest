@@ -1,1 +1,9 @@
 Flask
+pandas
+scikit-learn
+requests
+numpy
+matplotlib
+seaborn
+bcrypt
+pandas

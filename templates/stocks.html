@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Screened Stocks</title>
+</head>
+<body>
+    <h1>Screened Stocks</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Stock</th>
+                <th>Market Cap</th>
+                <th>P/E Ratio</th>
+                <th>Dividend Yield</th>
+                <!-- Add more columns as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in stocks %}
+            <tr>
+                <td>{{ stock.name }}</td>
+                <td>{{ stock.market_cap }}</td>
+                <td>{{ stock.pe_ratio }}</td>
+                <td>{{ stock.dividend_yield }}</td>
+                <!-- Add more columns as needed -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

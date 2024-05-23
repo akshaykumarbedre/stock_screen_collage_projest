@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    {% if error %}
+    <p>{{ error }}</p>
+    {% endif %}
+    <form method="post">
+        <label>
+            Username:
+            <input type="text" name="username" required>
+        </label>
+        <label>
+            Password:
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+</body>
+</html>
