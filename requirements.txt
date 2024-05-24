@@ -7,3 +7,6 @@ matplotlib
 seaborn
 bcrypt
 pandas
+ta
+yfinance
+apscheduler

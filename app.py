@@ -2,7 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
 import requests
 from sklearn.ensemble import RandomForestRegressor
+from apscheduler.schedulers.background import BackgroundScheduler
 import bcrypt
+import datetime as dt
+import ta 
+import pandas as pd
+import yfinance as yf
+
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
@@ -18,6 +24,7 @@ def load_users():
     return users_df
 
 users = load_users()
+
 
 
 @app.route("/")
@@ -91,15 +98,50 @@ def screen_stocks(filters):
 # Stock Recommendations
 @app.route("/recommend", methods=["GET", "POST"])
 def recommend():
-    if request.method == "POST":
-        risk_appetite = request.form["risk_appetite"]
-        portfolio = request.form["portfolio"]
-        recommendations = recommend_stocks(risk_appetite, portfolio)
-        return render_template("recommendations.html", recommendations=recommendations)
-    return render_template("recommend.html")
+    df=pd.read_csv("Nifty_Result.csv")
+    html_table = df.to_html()
+    return render_template("recommend.html", table=html_table)
+
+def indicater(df):
+        df['MACD hist']=ta.trend.macd_diff(df['Close'])
+        df['ADX']=ta.trend.adx(df["High"], df["Low"], df["Close"], window=14)
+        df['ATR']=ta.volatility.average_true_range(df["High"], df["Low"], df["Close"], window=14)
+        df["EMA 200"] = ta.trend.EMAIndicator(df['Close'], window=200, fillna=False).ema_indicator()
+        df['RSI']= ta.momentum.rsi(df["Close"], window=14)
+        df['Stochastic Oscillator']=ta.momentum.stoch(df["High"], df["Low"], df["Close"], window=14, smooth_window=3)
+        df['MACD hist sloap*']=df['MACD hist'].diff()
+        df["EMA 200 Sloap"]=df["EMA 200"].diff()/df['Close']
+        return df
+
+def run():
+    df=pd.read_csv("nifty_data.csv")
+    tickers=df['Symbol']
+
+    ohlc_data={}
+    start = dt.datetime.today()-dt.timedelta(365)
+    end = dt.datetime.today()
+
+    for ticker in tickers:
+        ohlc_data[ticker]=yf.download(ticker, interval="1d",start=start, end=end)
+
+        ohlc_data[ticker]=indicater(ohlc_data[ticker])
+        ohlc_data[ticker].drop(["Open","High","Low","Adj Close"],axis=1, inplace=True)
+        ohlc_data[ticker].rename(columns = {'Close':'Price'}, inplace = True)
+        ohlc_data[ticker]["Company Name"]=df[df['Symbol']==ticker]['Company Name'].iloc[0]
+
+    final_data = [ohlc_data[ticker].iloc[-1] for ticker in tickers]
+
+    df=pd.DataFrame(final_data).set_index("Company Name")
+    df.to_csv("Nifty_Result.csv")
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(run, 'interval', minutes=1440)
+scheduler.start()
+#run()
 
 def recommend_stocks(risk_appetite, portfolio):
     pass
+
 
 
 if __name__ == "__main__":
