@@ -8,12 +8,15 @@ import datetime as dt
 import ta 
 import pandas as pd
 import yfinance as yf
+import seaborn as sns
+import pickle
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
 # User Authentication
-# Load users from CSV using Pandas
 def load_users():
     try:
         users_df = pd.read_csv('users.csv', index_col='username')
@@ -24,8 +27,6 @@ def load_users():
     return users_df
 
 users = load_users()
-
-
 
 @app.route("/")
 def index():
@@ -86,21 +87,47 @@ def logout():
     return redirect(url_for("login"))
 
 # Stock Screening
-@app.route("/screen", methods=["GET", "POST"])
-def screen():
-	pass
+@app.route("/visualization", methods=["GET", "POST"])
+def visualization():
+    
+    print(compare_stock(10))
+    print(compare_stock(240))
 
-def screen_stocks(filters):
-    # Fetch stock data from financial APIs and apply filters
-    # Return filtered stock data as a pandas DataFrame
-    pass
+    df1=pd.read_csv("data10.csv")
+    df2=pd.read_csv("data240.csv")
+    
+    return render_template("visualization.html")
+
+
+def compare_stock(num, order=True):
+    with open('my_dict15m.pickle', 'rb') as handle:
+        ohlc_data = pickle.load(handle)
+
+    tickers=ohlc_data.keys()
+    compare = {}
+    for ticker in tickers:
+      close_prices = ohlc_data[ticker]['Price']
+      daily_returns = (close_prices.pct_change() + 1).iloc[-num:]
+      cumulative_returns = (daily_returns).cumprod()
+      compare[ticker] = cumulative_returns
+    df = pd.DataFrame(compare)
+
+   # Sort the tickers based on the last cumulative return value in descending order
+    sorted_tickers = df.iloc[-1].sort_values(ascending=not order).index
+
+   # Create a new DataFrame with the sorted tickers
+    sorted_df = df[sorted_tickers]
+    sorted_df.to_csv(f"data{num}.csv")
+
+    return sorted_df.iloc[:,[1,2,3,4,5]]
+
 
 # Stock Recommendations
-@app.route("/recommend", methods=["GET", "POST"])
-def recommend():
-    df=pd.read_csv("Nifty_Result.csv")
-    html_table = df.to_html()
-    return render_template("recommend.html", table=html_table)
+@app.route("/screener", methods=["GET", "POST"])
+def screener():
+    df=pd.read_csv("Nifty_Result1d.csv")
+    html_table = df.to_html(classes="sortable-table")
+    return render_template("screener.html", table=html_table)
 
 def indicater(df):
         df['MACD hist']=ta.trend.macd_diff(df['Close'])
@@ -113,36 +140,36 @@ def indicater(df):
         df["EMA 200 Sloap"]=df["EMA 200"].diff()/df['Close']
         return df
 
-def run():
+def run(interval='1d'):
     df=pd.read_csv("nifty_data.csv")
     tickers=df['Symbol']
 
     ohlc_data={}
-    start = dt.datetime.today()-dt.timedelta(365)
+    dic={'1d':350,"5m":30,"10m":30,"15m":30}
+    start = dt.datetime.today()-dt.timedelta(dic[interval])
     end = dt.datetime.today()
 
     for ticker in tickers:
-        ohlc_data[ticker]=yf.download(ticker, interval="1d",start=start, end=end)
+        ohlc_data[ticker]=yf.download(ticker, interval=interval,start=start, end=end)
 
         ohlc_data[ticker]=indicater(ohlc_data[ticker])
         ohlc_data[ticker].drop(["Open","High","Low","Adj Close"],axis=1, inplace=True)
         ohlc_data[ticker].rename(columns = {'Close':'Price'}, inplace = True)
         ohlc_data[ticker]["Company Name"]=df[df['Symbol']==ticker]['Company Name'].iloc[0]
+    
+    with open(f'my_dict{interval}.pickle', 'wb') as handle:
+        pickle.dump(ohlc_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     final_data = [ohlc_data[ticker].iloc[-1] for ticker in tickers]
 
     df=pd.DataFrame(final_data).set_index("Company Name")
-    df.to_csv("Nifty_Result.csv")
+    df.to_csv(f"Nifty_Result{interval}.csv")
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(run, 'interval', minutes=1440)
+scheduler.add_job(run, 'interval', minutes=15, args=["15m"])
 scheduler.start()
-#run()
-
-def recommend_stocks(risk_appetite, portfolio):
-    pass
-
-
+#run("15m")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True)

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multiple Interactive Plots</title>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Multiple Interactive Plots</h1>
+    {% for plot in plots %}
+    <h2>Plot: {{ plot[2] }}</h2>
+    <div id="plot{{ loop.index }}"></div>
+    <script>
+        var plot_div = document.getElementById("plot{{ loop.index }}");
+        plot_div.on("plotly_htmlinject", function(evt) {
+            Plotly.newPlot(plot_div, {{ plot[0]|tojson }}, {}, {{ plot[1]|tojson }});
+        })
+    </script>
+    {% endfor %}
+</body>
+</html>
