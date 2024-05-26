@@ -10,8 +10,14 @@ import pandas as pd
 import yfinance as yf
 import seaborn as sns
 import pickle
+import matplotlib
+matplotlib.use('Agg')  
+
+import io
+import base64
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+plt.style.use('ggplot')
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
@@ -89,14 +95,34 @@ def logout():
 # Stock Screening
 @app.route("/visualization", methods=["GET", "POST"])
 def visualization():
-    
-    print(compare_stock(10))
+    # Compare stock function calls
+    print(compare_stock(20))
     print(compare_stock(240))
+    print(compare_stock(20, order=False))
+    print(compare_stock(240, order=False))
 
-    df1=pd.read_csv("data10.csv")
-    df2=pd.read_csv("data240.csv")
-    
-    return render_template("visualization.html")
+    # Generate plots
+    plot_url_20 = generate_plot(pd.read_csv("data20True.csv"), 'Top Performers of the Past Month')
+    plot_url_240 = generate_plot(pd.read_csv("data240True.csv"), 'Top Performers of the Year')
+    plot_url_20n = generate_plot(pd.read_csv("data20False.csv"), 'Top Loser of the Past Month')
+    plot_url_240n = generate_plot(pd.read_csv("data240False.csv"), 'Top Loser of the Past Year')
+
+    # Render template with plot URLs
+    return render_template('visualization.html', plot_url_20=plot_url_20, plot_url_240=plot_url_240, plot_url_20N=plot_url_20n, plot_url_240N=plot_url_240n)
+
+    # Function to generate plots
+def generate_plot(dataframe, title):
+    fig, ax = plt.subplots()
+    for i in range(1, 6):
+        ax.plot(dataframe.iloc[:, i], label=dataframe.columns[i].replace(".NS", ""))
+    ax.yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(xmax=1))
+    ax.legend()
+    fig.set_size_inches(5, 4)
+    ax.set_title(title)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    return base64.b64encode(buf.getvalue()).decode('utf-8')
 
 
 def compare_stock(num, order=True):
@@ -117,10 +143,10 @@ def compare_stock(num, order=True):
 
    # Create a new DataFrame with the sorted tickers
     sorted_df = df[sorted_tickers]
-    sorted_df.to_csv(f"data{num}.csv")
+    sorted_df=(sorted_df-1)
+    sorted_df.to_csv(f"data{num}{order}.csv")
 
-    return sorted_df.iloc[:,[1,2,3,4,5]]
-
+    return pd.DataFrame(sorted_df.iloc[:,[1,2,3,4,5]])
 
 # Stock Recommendations
 @app.route("/screener", methods=["GET", "POST"])

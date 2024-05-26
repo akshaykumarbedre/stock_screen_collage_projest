@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Multiple Interactive Plots</title>
-    <!-- Plotly.js -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Plots</title>
+    <style>
+}
+    </style>
 </head>
 <body>
-    <h1>Multiple Interactive Plots</h1>
-    {% for plot in plots %}
-    <h2>Plot: {{ plot[2] }}</h2>
-    <div id="plot{{ loop.index }}"></div>
-    <script>
-        var plot_div = document.getElementById("plot{{ loop.index }}");
-        plot_div.on("plotly_htmlinject", function(evt) {
-            Plotly.newPlot(plot_div, {{ plot[0]|tojson }}, {}, {{ plot[1]|tojson }});
-        })
-    </script>
-    {% endfor %}
+    <div>
+    <h1>Top Performers of the Past month</h1>
+    <img src="data:image/png;base64,{{ plot_url_20 }}" alt="Plot 10 Days">
+    </div>
+    <div>
+    <h1>Top Looser of the Past month</h1>
+    <img src="data:image/png;base64,{{ plot_url_20N }}" alt="Plot 10 Days">
+    </div>
+    <div>
+    <h1>Top Performers of the Past Year</h1>
+    <img src="data:image/png;base64,{{ plot_url_240 }}" alt="Plot 240 Days">
+    </div>
+    <div>
+    <h1>Top Looser of the Past Year</h1>
+    <img src="data:image/png;base64,{{ plot_url_240N }}" alt="Plot 240 Days">
+</div>
 </body>
 </html>
