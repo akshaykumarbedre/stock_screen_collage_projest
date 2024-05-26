@@ -12,15 +12,17 @@ import seaborn as sns
 import pickle
 import matplotlib
 matplotlib.use('Agg')  
-
 import io
 import base64
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
 plt.style.use('ggplot')
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
+
+df=pd.read_csv("nifty_data.csv")
+df.set_index('index',inplace=True)
 
 # User Authentication
 def load_users():
@@ -114,10 +116,10 @@ def visualization():
 def generate_plot(dataframe, title):
     fig, ax = plt.subplots()
     for i in range(1, 6):
-        ax.plot(dataframe.iloc[:, i], label=dataframe.columns[i].replace(".NS", ""))
+        ax.plot(dataframe.iloc[:, i], label=df.loc[dataframe.columns[i]]['Company Name'])
     ax.yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(xmax=1))
     ax.legend()
-    fig.set_size_inches(5, 4)
+    fig.set_size_inches(8, 6)
     ax.set_title(title)
     buf = io.BytesIO()
     fig.savefig(buf, format='png')
@@ -126,7 +128,7 @@ def generate_plot(dataframe, title):
 
 
 def compare_stock(num, order=True):
-    with open('my_dict15m.pickle', 'rb') as handle:
+    with open('my_dict1d.pickle', 'rb') as handle:
         ohlc_data = pickle.load(handle)
 
     tickers=ohlc_data.keys()
