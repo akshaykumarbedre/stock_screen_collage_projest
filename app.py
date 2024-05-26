@@ -10,9 +10,7 @@ import pandas as pd
 import yfinance as yf
 import seaborn as sns
 import pickle
-import matplotlib
-matplotlib.use('Agg')  
-import io
+import io,os
 import base64
 import matplotlib.pyplot as plt
 
@@ -104,10 +102,10 @@ def visualization():
     print(compare_stock(240, order=False))
 
     # Generate plots
-    plot_url_20 = generate_plot(pd.read_csv("data20True.csv"), 'Top Performers of the Past Month')
-    plot_url_240 = generate_plot(pd.read_csv("data240True.csv"), 'Top Performers of the Year')
-    plot_url_20n = generate_plot(pd.read_csv("data20False.csv"), 'Top Loser of the Past Month')
-    plot_url_240n = generate_plot(pd.read_csv("data240False.csv"), 'Top Loser of the Past Year')
+    plot_url_20 = generate_plot(pd.read_csv(os.path.join('data',"data20True.csv")), 'Top Performers of the Past Month')
+    plot_url_240 = generate_plot(pd.read_csv(os.path.join('data',"data240True.csv")), 'Top Performers of the Year')
+    plot_url_20n = generate_plot(pd.read_csv(os.path.join('data',"data20False.csv")), 'Top Loser of the Past Month')
+    plot_url_240n = generate_plot(pd.read_csv(os.path.join('data',"data240False.csv")), 'Top Loser of the Past Year')
 
     # Render template with plot URLs
     return render_template('visualization.html', plot_url_20=plot_url_20, plot_url_240=plot_url_240, plot_url_20N=plot_url_20n, plot_url_240N=plot_url_240n)
@@ -128,7 +126,7 @@ def generate_plot(dataframe, title):
 
 
 def compare_stock(num, order=True):
-    with open('my_dict1d.pickle', 'rb') as handle:
+    with open(os.path.join('data','my_dict1d.pickle'), 'rb') as handle:
         ohlc_data = pickle.load(handle)
 
     tickers=ohlc_data.keys()
@@ -146,14 +144,14 @@ def compare_stock(num, order=True):
    # Create a new DataFrame with the sorted tickers
     sorted_df = df[sorted_tickers]
     sorted_df=(sorted_df-1)
-    sorted_df.to_csv(f"data{num}{order}.csv")
+    sorted_df.to_csv(os.path.join('data',f"data{num}{order}.csv"))
 
     return pd.DataFrame(sorted_df.iloc[:,[1,2,3,4,5]])
 
 # Stock Recommendations
 @app.route("/screener", methods=["GET", "POST"])
 def screener():
-    df=pd.read_csv("Nifty_Result1d.csv")
+    df=pd.read_csv(os.path.join('data',"Nifty_Result1d.csv"))
     html_table = df.to_html(classes="sortable-table")
     return render_template("screener.html", table=html_table)
 
@@ -185,19 +183,20 @@ def run(interval='1d'):
         ohlc_data[ticker].rename(columns = {'Close':'Price'}, inplace = True)
         ohlc_data[ticker]["Company Name"]=df[df['Symbol']==ticker]['Company Name'].iloc[0]
     
-    with open(f'my_dict{interval}.pickle', 'wb') as handle:
+    with open(os.path.join('data',f'my_dict{interval}.pickle'), 'wb') as handle:
         pickle.dump(ohlc_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     final_data = [ohlc_data[ticker].iloc[-1] for ticker in tickers]
 
     df=pd.DataFrame(final_data).set_index("Company Name")
-    df.to_csv(f"Nifty_Result{interval}.csv")
+    df.to_csv(os.path.join('data',f"Nifty_Result{interval}.csv"))
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(run, 'interval', minutes=1440)
 scheduler.add_job(run, 'interval', minutes=15, args=["15m"])
 scheduler.start()
 #run("15m")
+#run()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True)
