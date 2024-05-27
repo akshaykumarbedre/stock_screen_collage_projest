@@ -13,7 +13,6 @@ import pickle
 import io,os
 import base64
 import matplotlib.pyplot as plt
-
 plt.style.use('ggplot')
 
 app = Flask(__name__)
@@ -31,7 +30,6 @@ def load_users():
         users_df = pd.DataFrame(columns=['username', 'password', 'name', 'phone'])
         users_df.set_index('username', inplace=True)
     return users_df
-
 users = load_users()
 
 @app.route("/")
@@ -95,25 +93,33 @@ def logout():
 # Stock Screening
 @app.route("/visualization", methods=["GET", "POST"])
 def visualization():
-    # Compare stock function calls
-    print(compare_stock(20))
-    print(compare_stock(240))
-    print(compare_stock(20, order=False))
-    print(compare_stock(240, order=False))
 
     # Generate plots
     plot_url_20 = generate_plot(pd.read_csv(os.path.join('data',"data20True.csv")), 'Top Performers of the Past Month')
     plot_url_240 = generate_plot(pd.read_csv(os.path.join('data',"data240True.csv")), 'Top Performers of the Year')
     plot_url_20n = generate_plot(pd.read_csv(os.path.join('data',"data20False.csv")), 'Top Loser of the Past Month')
     plot_url_240n = generate_plot(pd.read_csv(os.path.join('data',"data240False.csv")), 'Top Loser of the Past Year')
+    plot_url_1200 = generate_plot(pd.read_csv(os.path.join('data',"data2400True.csv")), 'Top Performers of the 5 year')  
+    
 
     # Render template with plot URLs
-    return render_template('visualization.html', plot_url_20=plot_url_20, plot_url_240=plot_url_240, plot_url_20N=plot_url_20n, plot_url_240N=plot_url_240n)
+    return render_template('visualization.html', plot_url_20=plot_url_20, plot_url_240=plot_url_240, plot_url_20N=plot_url_20n, plot_url_240N=plot_url_240n,plot_url_1200=plot_url_1200)
+
+@app.route("/visualization_intraday", methods=["GET", "POST"])
+def visualization_intraday():
+    # Generate plots
+    plot_url_20 = generate_plot(pd.read_csv(os.path.join('data',"data20True.csv")), 'Todays Top Performers of Day')
+    plot_url_240 = generate_plot(pd.read_csv(os.path.join('data',"data240True.csv")), 'Top Performers of the Week')
+    plot_url_20n = generate_plot(pd.read_csv(os.path.join('data',"data20False.csv")), 'Top Loser of the Day')
+    plot_url_240n = generate_plot(pd.read_csv(os.path.join('data',"data240False.csv")), 'Top Loser of the Week')
+
+    # Render template with plot URLs
+    return render_template('visualization_intraday.html', plot_url_20=plot_url_20, plot_url_240=plot_url_240, plot_url_20N=plot_url_20n, plot_url_240N=plot_url_240n)
 
     # Function to generate plots
-def generate_plot(dataframe, title):
+def generate_plot(dataframe, title,no_of_stock=6):
     fig, ax = plt.subplots()
-    for i in range(1, 6):
+    for i in range(1, no_of_stock+1):
         ax.plot(dataframe.iloc[:, i], label=df.loc[dataframe.columns[i]]['Company Name'])
     ax.yaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(xmax=1))
     ax.legend()
@@ -123,10 +129,8 @@ def generate_plot(dataframe, title):
     fig.savefig(buf, format='png')
     buf.seek(0)
     return base64.b64encode(buf.getvalue()).decode('utf-8')
-
-
-def compare_stock(num, order=True):
-    with open(os.path.join('data','my_dict1d.pickle'), 'rb') as handle:
+def compare_stock(num, order=True,day="1d",num_stock=5):
+    with open(os.path.join('data',f'my_dict{day}.pickle'), 'rb') as handle:
         ohlc_data = pickle.load(handle)
 
     tickers=ohlc_data.keys()
@@ -146,7 +150,7 @@ def compare_stock(num, order=True):
     sorted_df=(sorted_df-1)
     sorted_df.to_csv(os.path.join('data',f"data{num}{order}.csv"))
 
-    return pd.DataFrame(sorted_df.iloc[:,[1,2,3,4,5]])
+    return pd.DataFrame(sorted_df.iloc[:,1:num_stock])
 
 # Stock Recommendations
 @app.route("/screener", methods=["GET", "POST"])
@@ -154,7 +158,6 @@ def screener():
     df=pd.read_csv(os.path.join('data',"Nifty_Result1d.csv"))
     html_table = df.to_html(classes="sortable-table")
     return render_template("screener.html", table=html_table)
-
 def indicater(df):
         df['MACD hist']=ta.trend.macd_diff(df['Close'])
         df['ADX']=ta.trend.adx(df["High"], df["Low"], df["Close"], window=14)
@@ -165,13 +168,12 @@ def indicater(df):
         df['MACD hist sloap*']=df['MACD hist'].diff()
         df["EMA 200 Sloap"]=df["EMA 200"].diff()/df['Close']
         return df
-
 def run(interval='1d'):
     df=pd.read_csv("nifty_data.csv")
     tickers=df['Symbol']
 
     ohlc_data={}
-    dic={'1d':350,"5m":30,"10m":30,"15m":30}
+    dic={'1d':2400,"5m":30,"10m":30,"15m":30}
     start = dt.datetime.today()-dt.timedelta(dic[interval])
     end = dt.datetime.today()
 
@@ -190,7 +192,20 @@ def run(interval='1d'):
 
     df=pd.DataFrame(final_data).set_index("Company Name")
     df.to_csv(os.path.join('data',f"Nifty_Result{interval}.csv"))
-
+    if(interval=='1d'):
+        compare_stock(20)
+        compare_stock(240)
+        compare_stock(20, order=False)
+        compare_stock(240, order=False)
+        compare_stock(1200,)
+        compare_stock(2400,)
+ 
+    if(interval=="15m"):
+        compare_stock(24,day="15m")
+        compare_stock(144,day="15m")
+        compare_stock(24, order=False,day="15m")
+        compare_stock(144, order=False,day="15m")
+    
 scheduler = BackgroundScheduler()
 scheduler.add_job(run, 'interval', minutes=1440)
 scheduler.add_job(run, 'interval', minutes=15, args=["15m"])
