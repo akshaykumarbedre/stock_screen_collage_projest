@@ -15,10 +15,14 @@
           }
 
     </style>
+   
 </head>
 <body>
-    <h1>Stock Recommendations</h1>
-    {{ table|safe }}
+    <h1>Stock Screener</h1>
+
+    <table id="stockTable">
+        {{ table|safe }}
+    </table>
 
     <script>
         let sortDirection = 1;
@@ -48,6 +52,7 @@
             header.addEventListener('click', () => sortTable(index));
         });
     </script>
+    
 
 </body>
 </html>

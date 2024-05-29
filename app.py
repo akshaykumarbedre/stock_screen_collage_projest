@@ -13,6 +13,7 @@ import pickle
 import io,os
 import base64
 import matplotlib.pyplot as plt
+from werkzeug.utils import secure_filename
 plt.style.use('ggplot')
 
 app = Flask(__name__)
@@ -31,13 +32,11 @@ def load_users():
         users_df.set_index('username', inplace=True)
     return users_df
 users = load_users()
-
 @app.route("/")
 def index():
     if "user" in session:
         return render_template("index.html", user=session["user"])
     return redirect(url_for("login"))
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -57,8 +56,6 @@ def login():
         # If authentication fails, return an error
         return render_template("login.html", error="Invalid username or password")
     return render_template("login.html")
-
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -82,14 +79,12 @@ def register():
         session["user"] = username
         return redirect(url_for("index"))
     return render_template("register.html")
-
 @app.route("/logout")
 def logout():
     # Remove the user from the session
     session.pop("user", None)
     # Redirect to the login page
     return redirect(url_for("login"))
-
 # Stock Screening
 @app.route("/visualization", methods=["GET", "POST"])
 def visualization():
@@ -104,14 +99,13 @@ def visualization():
 
     # Render template with plot URLs
     return render_template('visualization.html', plot_url_20=plot_url_20, plot_url_240=plot_url_240, plot_url_20N=plot_url_20n, plot_url_240N=plot_url_240n,plot_url_1200=plot_url_1200)
-
 @app.route("/visualization_intraday", methods=["GET", "POST"])
 def visualization_intraday():
     # Generate plots
-    plot_url_20 = generate_plot(pd.read_csv(os.path.join('data',"data20True.csv")), 'Todays Top Performers of Day')
-    plot_url_240 = generate_plot(pd.read_csv(os.path.join('data',"data240True.csv")), 'Top Performers of the Week')
-    plot_url_20n = generate_plot(pd.read_csv(os.path.join('data',"data20False.csv")), 'Top Loser of the Day')
-    plot_url_240n = generate_plot(pd.read_csv(os.path.join('data',"data240False.csv")), 'Top Loser of the Week')
+    plot_url_20 = generate_plot(pd.read_csv(os.path.join('data',"data24True.csv")), 'Todays Top Performers of Day')
+    plot_url_240 = generate_plot(pd.read_csv(os.path.join('data',"data144True.csv")), 'Top Performers of the Week')
+    plot_url_20n = generate_plot(pd.read_csv(os.path.join('data',"data24False.csv")), 'Top Loser of the Day')
+    plot_url_240n = generate_plot(pd.read_csv(os.path.join('data',"data144False.csv")), 'Top Loser of the Week')
 
     # Render template with plot URLs
     return render_template('visualization_intraday.html', plot_url_20=plot_url_20, plot_url_240=plot_url_240, plot_url_20N=plot_url_20n, plot_url_240N=plot_url_240n)
@@ -151,12 +145,15 @@ def compare_stock(num, order=True,day="1d",num_stock=5):
     sorted_df.to_csv(os.path.join('data',f"data{num}{order}.csv"))
 
     return pd.DataFrame(sorted_df.iloc[:,1:num_stock])
-
+def make_clickable(val):
+    return f'<a href="https://www.google.com/finance/quote/{df[df["Company Name"]==val]["Symbol"].str.replace(".NS","").to_list()[0]}:NSE" target="_blank">{val}</a>'
 # Stock Recommendations
 @app.route("/screener", methods=["GET", "POST"])
 def screener():
     df=pd.read_csv(os.path.join('data',"Nifty_Result1d.csv"))
-    html_table = df.to_html(classes="sortable-table")
+    df['Company Name'] = df['Company Name'].apply(make_clickable)
+
+    html_table = df.to_html(classes="sortable-table",escape=False, index=False)
     return render_template("screener.html", table=html_table)
 def indicater(df):
         df['MACD hist']=ta.trend.macd_diff(df['Close'])
@@ -206,6 +203,46 @@ def run(interval='1d'):
         compare_stock(24, order=False,day="15m")
         compare_stock(144, order=False,day="15m")
     
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+POSTS_FILE = 'posts.txt'
+
+def load_posts():
+    posts = []
+    if os.path.exists(POSTS_FILE):
+        with open(POSTS_FILE, 'r') as f:
+            for line in f:
+                title, content, image_filename = line.strip().split('|||')
+                posts.append({'title': title, 'content': content, 'image_filename': image_filename})
+    return posts
+
+def save_posts(posts):
+    with open(POSTS_FILE, 'w') as f:
+        for post in posts:
+            f.write(f"{post['title']}|||{post['content']}|||{post.get('image_filename', '')}\n")
+
+@app.route('/blog')
+def blog():
+    posts = load_posts()
+    return render_template('blog.html', posts=posts)
+
+@app.route('/admin', methods=['GET', 'POST'])
+def new_post():
+    posts = load_posts()
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        image_file = request.files.get('image_file', None)
+        if image_file:
+            image_filename = secure_filename(image_file.filename)
+            image_file.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))
+        else:
+            image_filename = ''
+        post = {'title': title, 'content': content, 'image_filename': image_filename}
+        posts.append(post)
+        save_posts(posts)
+        return redirect(url_for('blog'))
+    return render_template('new_post.html')
+
 scheduler = BackgroundScheduler()
 scheduler.add_job(run, 'interval', minutes=1440)
 scheduler.add_job(run, 'interval', minutes=15, args=["15m"])

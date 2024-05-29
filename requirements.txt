@@ -12,3 +12,4 @@ yfinance
 apscheduler
 plotly
 matplotlib
+werkzeug
