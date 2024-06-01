@@ -283,8 +283,6 @@ def portfolio():
         allocation = portfolio_allocation(age, investor_type)
     return render_template('portfolio.html', allocation=allocation)
 
-if __name__ == '__main__':
-    app.run(debug=True)
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(run, 'interval', minutes=1440)
