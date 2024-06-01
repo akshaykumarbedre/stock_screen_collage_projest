@@ -1,0 +1,14 @@
+Investor Type,Age, Equity,Mutual Funds,Debt Funds,Sovereign Gold Bonds,Government Bonds,Public Provident Fund,Fixed Deposits
+Aggressive Investor ,20,80,15,0,0,0,0,5
+Moderate Investor ,20,50,25,10,5,0,5,5
+Conservative Investor ,20,20,20,20,10,10,10,10
+Aggressive Investor ,30,75,20,0,0,0,0,5
+Moderate Investor ,30,45,30,10,5,0,5,5
+Conservative Investor ,30,15,25,25,10,10,5,10
+Aggressive Investor ,40,70,25,0,0,0,0,5
+Moderate Investor ,40,40,35,10,5,0,5,5
+Conservative Investor ,40,10,30,30,10,10,0,10
+Aggressive Investor ,50,65,30,0,0,0,0,5
+Moderate Investor ,50,35,40,10,5,0,5,5
+Conservative Investor ,50,5,35,35,10,5,0,10
+

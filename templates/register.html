@@ -23,7 +23,7 @@
         </label>
         <label>
             Password:
-            <input type="password" name="password" required>
+            <input type="password" name="password"  required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};:\\|,.\/?]).{8,}$" title="Must contain at least one number, one uppercase letter, one lowercase letter, one special character, and be at least 8 characters long" >
         </label>
         <button type="submit">Register</button>
     </form>

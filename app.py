@@ -4,6 +4,7 @@ import requests
 from sklearn.ensemble import RandomForestRegressor
 from apscheduler.schedulers.background import BackgroundScheduler
 import bcrypt
+import numpy as np
 import datetime as dt
 import ta 
 import pandas as pd
@@ -12,6 +13,7 @@ import seaborn as sns
 import pickle
 import io,os
 import base64
+import json
 import matplotlib.pyplot as plt
 from werkzeug.utils import secure_filename
 plt.style.use('ggplot')
@@ -242,6 +244,47 @@ def new_post():
         save_posts(posts)
         return redirect(url_for('blog'))
     return render_template('new_post.html')
+
+# Load the model
+filename = 'portfolio.pkl'
+with open(filename, 'rb') as file:
+    model = pickle.load(file)
+
+from flask import Flask, render_template, request
+import pandas as pd
+import numpy as np
+import pickle
+
+app = Flask(__name__)
+
+# Load the model
+filename = 'portfolio.pkl'
+with open(filename, 'rb') as file:
+    model = pickle.load(file)
+
+def portfolio_allocation(Age, Investor_Type):
+    Investor_Type = Investor_Type.replace("Aggressive Investor ", "3")
+    Investor_Type = Investor_Type.replace("Moderate Investor ", "2")
+    Investor_Type = Investor_Type.replace("Conservative Investor ", "1")
+    df = pd.DataFrame({"Age": [Age], 'Investor Type': [Investor_Type]})
+    predict_value = model.predict(df)[0]
+    df_result = predict_value / predict_value.sum() * 100
+    df_round = np.round(df_result)
+    columns = ['Equity', 'Mutual Funds', 'Debt Funds', 'Sovereign Gold Bonds', 'Government Bonds', 'Public Provident Fund', 'Fixed Deposits']
+    df_allocation = pd.DataFrame([df_round], columns=columns)
+    return df_allocation.to_dict('records')[0]
+
+@app.route('/portfolio', methods=['GET', 'POST'])
+def portfolio():
+    allocation = None
+    if request.method == 'POST':
+        age = int(request.form['age'])
+        investor_type = request.form['investor_type']
+        allocation = portfolio_allocation(age, investor_type)
+    return render_template('portfolio.html', allocation=allocation)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(run, 'interval', minutes=1440)

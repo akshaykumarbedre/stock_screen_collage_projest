@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Portfolio Allocation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Portfolio Allocation</h1>
+      <form method="post" action="{{ url_for('portfolio') }}">
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" class="form-control" id="age" name="age" required>
+        </div>
+        <div class="form-group">
+          <label for="investor_type">Investor Type:</label>
+          <select class="form-control" id="investor_type" name="investor_type" required>
+            <option value="">Select Investor Type</option>
+            <option value="Aggressive Investor ">Aggressive Investor</option>
+            <option value="Moderate Investor ">Moderate Investor</option>
+            <option value="Conservative Investor ">Conservative Investor</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Get Allocation</button>
+      </form>
+      {% if allocation %}
+      <h2>Allocation Results:</h2>
+      <div>
+        <canvas id="allocationChart"></canvas>
+      </div>
+      <script>
+        var allocationData = {{ allocation|tojson }};
+        var labels = Object.keys(allocationData);
+        var values = Object.values(allocationData);
+
+        var ctx = document.getElementById('allocationChart').getContext('2d');
+        var chart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: values,
+              backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#8BC34A',
+                '#9C27B0',
+                '#673AB7',
+                '#4CAF50'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      </script>
+      {% endif %}
+    </div>
+  </body>
+</html>
