@@ -250,12 +250,6 @@ filename = 'portfolio.pkl'
 with open(filename, 'rb') as file:
     model = pickle.load(file)
 
-from flask import Flask, render_template, request
-import pandas as pd
-import numpy as np
-import pickle
-
-app = Flask(__name__)
 
 # Load the model
 filename = 'portfolio.pkl'
