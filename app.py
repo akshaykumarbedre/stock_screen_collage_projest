@@ -250,12 +250,6 @@ filename = 'portfolio.pkl'
 with open(filename, 'rb') as file:
     model = pickle.load(file)
 
-
-# Load the model
-filename = 'portfolio.pkl'
-with open(filename, 'rb') as file:
-    model = pickle.load(file)
-
 def portfolio_allocation(Age, Investor_Type):
     Investor_Type = Investor_Type.replace("Aggressive Investor ", "3")
     Investor_Type = Investor_Type.replace("Moderate Investor ", "2")
