@@ -264,12 +264,15 @@ def portfolio_allocation(Age, Investor_Type):
 
 @app.route('/portfolio', methods=['GET', 'POST'])
 def portfolio():
-    allocation = None
-    if request.method == 'POST':
-        age = int(request.form['age'])
-        investor_type = request.form['investor_type']
-        allocation = portfolio_allocation(age, investor_type)
-    return render_template('portfolio.html', allocation=allocation)
+    try:
+        allocation = None
+        if request.method == 'POST':
+            age = int(request.form['age'])
+            investor_type = request.form['investor_type']
+            allocation = portfolio_allocation(age, investor_type)
+        return render_template('portfolio.html', allocation=allocation)
+    except Exception as e:
+        print(e)
 
 
 scheduler = BackgroundScheduler()
