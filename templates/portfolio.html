@@ -26,6 +26,7 @@
       </form>
       {% if allocation %}
       <h2>Allocation Results:</h2>
+
       <div>
         <canvas id="allocationChart"></canvas>
       </div>
@@ -58,6 +59,9 @@
           }
         });
       </script>
+      {% if cagr %}
+      <h3>CAGR: {{ cagr * 100 }}%</h3>
+      {% endif %}
       {% endif %}
     </div>
   </body>

@@ -250,6 +250,16 @@ filename = 'portfolio.pkl'
 with open(filename, 'rb') as file:
     model = pickle.load(file)
 
+avg_returns = {
+    'Equity': 0.18,  # Equity mutual funds have provided annual returns of around 15%[^1^][3].
+    'Mutual Funds': 0.12,  # This remains the same as the average returns for mutual funds.
+    'Debt Funds': 0.09,  # Debt funds have average returns of approximately 9%[^1^][3].
+    'Sovereign Gold Bonds': 0.05,  # This remains the same as the average returns for sovereign gold bonds.
+    'Government Bonds': 0.06,  # This remains the same as the average returns for government bonds.
+    'Public Provident Fund': 0.08,  # This remains the same as the average returns for PPF.
+    'Fixed Deposits': 0.075  # This remains the same as the average returns for fixed deposits.
+}
+
 def portfolio_allocation(Age, Investor_Type):
     Investor_Type = Investor_Type.replace("Aggressive Investor ", "3")
     Investor_Type = Investor_Type.replace("Moderate Investor ", "2")
@@ -260,17 +270,24 @@ def portfolio_allocation(Age, Investor_Type):
     df_round = np.round(df_result)
     columns = ['Equity', 'Mutual Funds', 'Debt Funds', 'Sovereign Gold Bonds', 'Government Bonds', 'Public Provident Fund', 'Fixed Deposits']
     df_allocation = pd.DataFrame([df_round], columns=columns)
-    return df_allocation.to_dict('records')[0]
+
+    # Calculate CAGR
+    cagr = 0
+    for col, weight in df_allocation.iloc[0].items():
+        cagr += weight * avg_returns[col] / 100
+
+    return df_allocation.to_dict('records')[0], cagr
 
 @app.route('/portfolio', methods=['GET', 'POST'])
 def portfolio():
     try:
         allocation = None
+        cagr = None
         if request.method == 'POST':
             age = int(request.form['age'])
             investor_type = request.form['investor_type']
-            allocation = portfolio_allocation(age, investor_type)
-        return render_template('portfolio.html', allocation=allocation)
+            allocation, cagr = portfolio_allocation(age, investor_type)
+        return render_template('portfolio.html', allocation=allocation, cagr=cagr)
     except Exception as e:
         print(e)
 
