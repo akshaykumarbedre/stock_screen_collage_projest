@@ -24,47 +24,62 @@
     <main>
         <section class="hero">
             <div class="hero-content">
-                <h1>Personalized Portfolio & Stock Screene</h1>
-                <p>Get personalized portfolio recommendations, real-time market data visualizations, and in-depth stock screening capabilities. </p>
+                <h1>AI Bases Personalized Portfolio</h1>
+                <p>Get personalized portfolio recommendations, For Longterm investment </p>
                 <div class="cta-buttons">
                     <a href="{{ url_for('portfolio') }}" class="btn"> Make your Portfolio </a>
-                    <a href="{{ url_for('screener') }}" class="btn btn-outline">Find the Best Stock</a>
                 </div>
             </div>
             <div class="hero-image">
-                <img src="mobile-app.png" alt="Mobile App">
+                <img src="{{ url_for('static', filename='img.png') }}" alt="portfolio">
             </div>
         </section>
 
         <section class="integrations">
-            <h2>Integrations</h2>
-            <div class="integration-logos">
-                <img src="paypal-logo.png" alt="PayPal">
-                <img src="pay-logo.png" alt="Pay">
-                <img src="nfcnext-logo.png" alt="NFCNext">
-                <img src="wire-logo.png" alt="Wire">
-                <img src="visa-logo.png" alt="Visa">
-            </div>
-            <a href="#" class="btn">Learn More</a>
+       
+            <h2>Technical Indicator based Stock Screener</h2>
+            <p>Navigating the Market with Precision: The Ultimate Technical Indicator Stock Screener</p>
+            <br>
+            <a href="{{ url_for('screener') }}" class="btn">Select Stock</a>
         </section>
 
         <section class="services">
-            <h2>Our Services</h2>
+            <h2>Feature</h2>
             <div class="service-cards">
                 <div class="card">
-                    <img src="service-icon-1.png" alt="Service Icon">
-                    <h3>Borderless Service</h3>
-                    <p>A wide range of currencies are supported, enabling cross-border transactions.</p>
+                    <img src="{{ url_for('static', filename='images.png') }}" alt="Stock Screener Icon">
+                    <h3>Real-time Stock Screener</h3>
+                    <p>Explore our powerful stock screening tool for real-time analysis and filtering.</p>
                 </div>
+                
                 <div class="card">
-                    <img src="service-icon-2.png" alt="Service Icon">
-                    <h3>No Additional Fees</h3>
-                    <p>Transactions are free, and no additional fees are charged.</p>
+                    <img src="{{ url_for('static', filename='pie-chart.png') }}" alt="Portfolio Recommendation Icon">
+                    <h3>Personalized Portfolio Recommendations</h3>
+                    <p>Get tailored portfolio recommendations based on your risk profile and investment goals.</p>
                 </div>
+                
                 <div class="card">
-                    <img src="service-icon-3.png" alt="Service Icon">
-                    <h3>Cashback Promo</h3>
-                    <p>Customers can receive cashback promos on their digital transactions.</p>
+                    <img src="{{ url_for('static', filename='data-visualization.png') }}"  alt="Data Visualization Icon">
+                    <h3>Market Data Visualizations</h3>
+                    <p>Visualize market data with interactive charts and graphs for better insights.</p>
+                </div>
+                
+                <div class="card">
+                    <img src="{{ url_for('static', filename='chart-bars.png') }}"  alt="Analysis Icon">
+                    <h3>Intraday and Historical Analysis</h3>
+                    <p>Perform in-depth analysis of intraday and historical stock data.</p>
+                </div>
+                
+                <div class="card">
+                    <img src="{{ url_for('static', filename='blog.png') }}"  alt="Blog Icon">
+                    <h3>Educational Blog and Resources</h3>
+                    <p>Access our educational blog and resources to enhance your trading knowledge.</p>
+                </div>
+                
+                <div class="card">
+                    <img src="{{ url_for('static', filename='auth.png') }}" alt="Authentication Icon">
+                    <h3>User Authentication and Portfolio Management</h3>
+                    <p>Securely manage your portfolio with our user authentication and management system.</p>
                 </div>
             </div>
         </section>

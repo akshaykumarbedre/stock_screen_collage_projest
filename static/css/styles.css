@@ -210,3 +210,138 @@ a {
 a:hover {
     color: #8e8e8e; /* Light gray color on hover */
 }
+/* Reset and global styles */
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+    color: #e6e6e6;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #1a1a1a;
+}
+
+a {
+    color: #ffffff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #cccccc;
+}
+
+/* Header styles */
+header {
+    background-color: #2d2d2d;
+    color: #e6e6e6;
+    padding: 1rem;
+}
+
+nav ul {
+    list-style-type: none;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+/* Main content styles */
+main {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid #4d4d4d;
+}
+
+th {
+    background-color: #2d2d2d;
+    color: #e6e6e6;
+}
+
+/* Form styles */
+form {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+input, textarea {
+    padding: 0.5rem;
+    border: 1px solid #4d4d4d;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #1a1a1a;
+    color: #e6e6e6;
+}
+
+button {
+    background-color: #4d4d4d;
+    color: #e6e6e6;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #6d6d6d;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    nav ul li {
+        display: block;
+        margin: 0.5rem 0;
+    }
+
+    main {
+        padding: 0;
+    }
+
+    table {
+        font-size: 0.8rem;
+    }
+}
+
+.hero-image img {
+    width: 400px;
+    height: auto;
+}
+.service-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+.card{
+    flex: 1 1 200px; /* Grow, shrink, and base width */
+    margin: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+  
+  /* Responsive adjustments */
+  @media (max-width: 800px) {
+    .card {
+      flex: 1 1 100%; /* Full width on smaller screens */
+    }
+  }
+  

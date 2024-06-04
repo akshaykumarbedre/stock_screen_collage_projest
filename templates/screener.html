@@ -18,6 +18,58 @@
             line-height: 1.6;
             background-color: #1a1a1a; /* Dark background color */
         }
+        .stock-screener {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #f8f9fa;
+            background-color: #343a40;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .stock-screener h2 {
+            background-color: #797979;
+            color: #f8f9fa;
+            padding: 10px;
+            text-align: center;
+            border-radius: 4px;
+        }
+        
+        .stock-screener .indicator h3 {
+            background-color: #5b38e6;
+            color: #f8f9fa;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .stock-screener ul {
+            background-color: #495057;
+            border: 1px solid #6c757d;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        
+        .stock-screener li {
+            margin-bottom: 10px;
+        }
+        
+        /* Additional styles for visual enhancement */
+        .stock-screener .indicator {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+        
+        .stock-screener ul {
+            list-style-type: none;
+        }
+        
+        .stock-screener li::before {
+            content: '✔️';
+            margin-right: 5px;
+            color: #28a745;
+        }
+
+        
         
 
     </style>
@@ -39,7 +91,51 @@
             </ul>
         </nav>
     </header>
-    <h1>Stock Screener</h1>
+    <h1>Stock Screeners for Nifty 200 Stocks</h1>
+    <p> Stay ahead in the market with our platform’s real-time stock updates every 5 hours. Keep your investment strategy sharp with the latest data on the Nifty 200 and more. We’ve got the data; you make the decisions.</p>
+    <div class="stock-screener">
+        <h2>Stock Screener Guidelines</h2>
+        <div class="indicator">
+            <h3>Relative Strength Index (RSI)</h3>
+            <ul>
+                <li>Look for stocks with RSI values below 70 (indicating they are not overbought) but above 30 (indicating they are not oversold).</li>
+                <li>RSI values around 50 are considered neutral.</li>
+                <li>Higher RSI values suggest bullish momentum, while lower values suggest bearish momentum.</li>
+            </ul>
+        </div>
+        <div class="indicator">
+            <h3>Moving Average Convergence Divergence (MACD)</h3>
+            <ul>
+                <li>Positive MACD histogram values indicate bullish momentum.</li>
+                <li>Negative MACD histogram values indicate bearish momentum.</li>
+                <li>Consider stocks with rising MACD histogram values.</li>
+            </ul>
+        </div>
+        <div class="indicator">
+            <h3>ADX (Average Directional Index)</h3>
+            <ul>
+                <li>ADX values above 25 suggest a strong trend (either bullish or bearish).</li>
+                <li>Look for stocks with rising ADX values, indicating a strengthening trend.</li>
+            </ul>
+        </div>
+        <div class="indicator">
+            <h3>ATR (Average True Range)</h3>
+            <ul>
+                <li>ATR measures volatility. Higher ATR values suggest greater price movement.</li>
+                <li>Consider stocks with moderate to high ATR values based on your risk tolerance.</li>
+            </ul>
+        </div>
+        <div class="indicator">
+            <h3>EMA 200 (Exponential Moving Average)</h3>
+            <ul>
+                <li>Stocks trading above their 200-day EMA are often considered in an uptrend.</li>
+                <li>Look for stocks with positive EMA 200 slope (rising trend).</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>Note:Click the stock to view the Fundamentals of the stock</h3>
+   
 
     <table id="stockTable">
         {{ table|safe }}
