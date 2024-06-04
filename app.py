@@ -293,11 +293,11 @@ def portfolio():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(run, 'interval', minutes=1440)
+scheduler.add_job(run, 'interval', minutes=280)
 scheduler.add_job(run, 'interval', minutes=15, args=["15m"])
 scheduler.start()
 #run("15m")
 #run()
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0',debug=True)
+    app.run(host='0.0.0.0',debug=True,port=5001)

@@ -1,18 +1,77 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Stock Screener and Recommendation System</title>
-
+    <title>  Personalized Portfolio management and Stock Screener </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <h1>Welcome, {{ user }}!</h1>
-    <a href="{{ url_for('visualization') }}">visualization</a>
-    <a href="{{ url_for('visualization_intraday') }}">visualization_intraday</a>
-    <a href="{{ url_for('screener') }}">Screen screener</a>
-    <a href="{{ url_for('blog') }}">Blog</a>
-    <a href="{{ url_for('portfolio') }}">Portfolio</a>
+    <header>
+        <nav>
+            <a href="#" class="logo">PayPro</a>
+            <ul>
+                <li><a href="{{ url_for('screener') }}">Screen screener</a></li>
+                <li><a href="{{ url_for('portfolio') }}">Portfolio</a></li>
+                <li> <a href="{{ url_for('visualization_intraday') }}">Visualization Intraday</a></li>
+                <li> <a href="{{ url_for('visualization') }}">Visualization</a></li>
+                <li> <a href="{{ url_for('blog') }}">Blog</a></li>
+                <li>    <a href="{{ url_for('logout') }}"> {{ user }} Logout</a></li>
 
+            </ul>
+        </nav>
+    </header>
 
-    <a href="{{ url_for('logout') }}">Logout</a>
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Personalized Portfolio & Stock Screene</h1>
+                <p>Get personalized portfolio recommendations, real-time market data visualizations, and in-depth stock screening capabilities. </p>
+                <div class="cta-buttons">
+                    <a href="{{ url_for('portfolio') }}" class="btn"> Make your Portfolio </a>
+                    <a href="{{ url_for('screener') }}" class="btn btn-outline">Find the Best Stock</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="mobile-app.png" alt="Mobile App">
+            </div>
+        </section>
+
+        <section class="integrations">
+            <h2>Integrations</h2>
+            <div class="integration-logos">
+                <img src="paypal-logo.png" alt="PayPal">
+                <img src="pay-logo.png" alt="Pay">
+                <img src="nfcnext-logo.png" alt="NFCNext">
+                <img src="wire-logo.png" alt="Wire">
+                <img src="visa-logo.png" alt="Visa">
+            </div>
+            <a href="#" class="btn">Learn More</a>
+        </section>
+
+        <section class="services">
+            <h2>Our Services</h2>
+            <div class="service-cards">
+                <div class="card">
+                    <img src="service-icon-1.png" alt="Service Icon">
+                    <h3>Borderless Service</h3>
+                    <p>A wide range of currencies are supported, enabling cross-border transactions.</p>
+                </div>
+                <div class="card">
+                    <img src="service-icon-2.png" alt="Service Icon">
+                    <h3>No Additional Fees</h3>
+                    <p>Transactions are free, and no additional fees are charged.</p>
+                </div>
+                <div class="card">
+                    <img src="service-icon-3.png" alt="Service Icon">
+                    <h3>Cashback Promo</h3>
+                    <p>Customers can receive cashback promos on their digital transactions.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 PayPro. All rights reserved.</p>
+    </footer>
 </body>
 </html>

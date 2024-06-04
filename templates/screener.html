@@ -11,13 +11,34 @@
           }
           
           th:hover {
-            background-color: #e6e6e6;
+            background-color: #737373;
           }
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #1a1a1a; /* Dark background color */
+        }
+        
 
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
    
 </head>
 <body>
+    <header>
+        <nav>
+            <a href="{{ url_for('index') }}" class="logo">PayPro</a>
+            <ul>
+                <li><a href="{{ url_for('screener') }}">Screen screener</a></li>
+                <li><a href="{{ url_for('portfolio') }}">Portfolio</a></li>
+                <li> <a href="{{ url_for('visualization_intraday') }}">Visualization Intraday</a></li>
+                <li> <a href="{{ url_for('visualization') }}">Visualization</a></li>
+                <li> <a href="{{ url_for('blog') }}">Blog</a></li>
+                <li>    <a href="{{ url_for('logout') }}"> {{ user }} Logout</a></li>
+
+            </ul>
+        </nav>
+    </header>
     <h1>Stock Screener</h1>
 
     <table id="stockTable">
